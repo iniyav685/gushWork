@@ -442,4 +442,80 @@ document.addEventListener('DOMContentLoaded', () => {
         // Initialize Transition property for process content
         processContent.style.transition = 'opacity 0.2s ease';
     }
+
+    // ─────────────────────────────────────────────────────────
+    //  SCROLL BEHAVIOUR
+    //  · Navbar hides on scroll-down, slides back on scroll-up
+    //  · Sticky bar appears once product-details leaves viewport
+    //  · Navbar "pushes" the sticky bar — bar top = navbar height
+    //    when navbar visible, 0 when navbar is hidden
+    // ─────────────────────────────────────────────────────────
+    (function initScrollBehaviour() {
+        const navbar = document.querySelector('.navbar');
+        const stickyBar = document.getElementById('sticky-bar');
+        const stickyImg = document.getElementById('sticky-bar-img');
+        const mainImg = document.getElementById('main-product-image');
+        const details = document.querySelector('.product-details');
+
+        if (!navbar) return;
+
+        // ── measure & store navbar height as CSS var ──
+        let navH = 0;
+        function measureNav() {
+            navH = navbar.offsetHeight;
+            document.documentElement.style.setProperty('--navbar-height', navH + 'px');
+        }
+        measureNav();
+        window.addEventListener('resize', measureNav);
+
+        // ── set sticky bar top so navbar "pushes" it ──
+        function setStickyTop(navbarVisible) {
+            if (!stickyBar) return;
+            stickyBar.style.top = navbarVisible ? navH + 'px' : '0px';
+        }
+
+        // initialise to sit below navbar
+        setStickyTop(true);
+
+        let lastY = window.scrollY;
+        let ticking = false;
+        const THRESHOLD = 80;          // px before we start hiding the navbar
+
+        function onScroll() {
+            if (ticking) return;
+            ticking = true;
+
+            requestAnimationFrame(() => {
+                const y = window.scrollY;
+                const goingDown = y > lastY;
+                const pastThresh = y > THRESHOLD;
+
+                // ── Navbar: hide scrolling down, reveal scrolling up ──
+                const shouldHide = goingDown && pastThresh;
+                navbar.classList.toggle('navbar-hidden', shouldHide);
+                navbar.classList.toggle('navbar-scrolled', y > 0);
+
+                // ── Update sticky bar top to match navbar state ──
+                setStickyTop(!shouldHide);
+
+                // ── Sticky bar: show once product-details fully off screen ──
+                if (stickyBar && details) {
+                    const gone = details.getBoundingClientRect().bottom < 0;
+                    stickyBar.classList.toggle('is-visible', gone);
+                }
+
+                lastY = y;
+                ticking = false;
+            });
+        }
+
+        window.addEventListener('scroll', onScroll, { passive: true });
+
+        // ── Keep sticky bar thumbnail in sync with active gallery image ──
+        if (stickyImg && mainImg) {
+            new MutationObserver(() => {
+                stickyImg.src = mainImg.src;
+            }).observe(mainImg, { attributes: true, attributeFilter: ['src'] });
+        }
+    })();
 });
