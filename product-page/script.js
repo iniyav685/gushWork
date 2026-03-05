@@ -364,8 +364,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentProcessIndex = 0;
     const processTabs = document.querySelectorAll('.process-tab');
     const processContent = document.querySelector('.process-content');
-    const processPrevBtn = document.querySelector('.process-prev-btn');
-    const processNextBtn = document.querySelector('.process-next-btn');
+    const processPrevBtns = document.querySelectorAll('.process-prev-btn');
+    const processNextBtns = document.querySelectorAll('.process-next-btn');
 
     if (processTabs.length > 0 && processContent) {
         const processTitle = processContent.querySelector('h3');
@@ -421,23 +421,23 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         // Add Nav Button Events
-        if (processPrevBtn) {
+        processPrevBtns.forEach(processPrevBtn => {
             processPrevBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
                 let newIndex = currentProcessIndex - 1;
                 if (newIndex < 0) newIndex = processData.length - 1;
                 updateProcessStep(newIndex);
             });
-        }
+        });
 
-        if (processNextBtn) {
+        processNextBtns.forEach(processNextBtn => {
             processNextBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
                 let newIndex = currentProcessIndex + 1;
                 if (newIndex >= processData.length) newIndex = 0;
                 updateProcessStep(newIndex);
             });
-        }
+        });
 
         // Initialize Transition property for process content
         processContent.style.transition = 'opacity 0.2s ease';
