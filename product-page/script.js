@@ -181,7 +181,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const closeModalBtn = document.getElementById('close-modal');
     const datasheetForm = document.getElementById('datasheet-form');
     const emailInput = document.getElementById('modal-email');
-    const submitBtn = document.getElementById('modal-submit-btn');
+    const submitBtn = document.getElementById('submit-btn');
 
     if (openModalBtn && datasheetModal && closeModalBtn) {
         // Open Modal
